@@ -1,0 +1,17 @@
+{
+  "name": "astezenko/testplugin",
+  "authors": [
+    {
+      "name": "Andrei Stezenko",
+      "email": "andrew.stezenko@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "TestPlugin\\": "./"
+    }
+  },
+  "require": {
+    "psr/log": "^3.0"
+  }
+}
