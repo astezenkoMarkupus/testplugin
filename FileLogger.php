@@ -48,6 +48,6 @@ class FileLogger implements LoggerInterface {
 		$dateFormatted = ( new \DateTime() )->format( 'd.m.Y H:i:s' );
 		$message       = sprintf( '[%s] %s: %s%s', $dateFormatted, $level, $message, PHP_EOL );
 
-		file_put_contents( plugin_dir_path( __DIR__ ) . 'testplugin/logs/errors.log', $message, FILE_APPEND );
+		file_put_contents( WP_PLUGIN_DIR . '/testplugin/logs/errors.log', $message, FILE_APPEND );
 	}
 }
