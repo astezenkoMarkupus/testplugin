@@ -18,10 +18,37 @@
 	}
 	?>
 
-	<form class="testplugin-form">
+	<form class="form testplugin-form">
 		<fieldset>
-			<button><?php _e( 'Get ToDos', 'testplugin' ) ?></button>
+			<button class="button">
+				<?php _e( 'Sync ToDos', 'testplugin' ) ?>
+				<span>...</span>
+			</button>
 		</fieldset>
 	</form>
+
+	<form class="form testplugin-form-search">
+		<fieldset>
+			<label>
+				<input type="text" name="title">
+			</label>
+			<button class="button">
+				<?php _e( 'Search by Title', 'testplugin' ) ?>
+				<span>...</span>
+			</button>
+		</fieldset>
+	</form>
+
+	<div class="testplugin-todos-list">
+		<h2>ToDos:</h2>
+		<div class="testplugin-todos-heading">
+			<div>ID</div>
+			<div>User ID</div>
+			<div>ToDo ID</div>
+			<div>Title</div>
+			<div>Completed</div>
+		</div>
+		<div class="testplugin-todos-items"></div>
+	</div>
 </div>
 

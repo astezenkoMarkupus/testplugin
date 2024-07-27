@@ -30,9 +30,15 @@ class TestPlugin {
 
 		add_action( 'admin_menu', [ $this, 'add_admin_page' ] );
 
+		add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );
+		add_action( 'wp_ajax_testplugin_ajax_load_todos', [ $this, 'testplugin_ajax_load_todos' ] );
+		add_action( 'wp_ajax_testplugin_ajax_search_todos', [ $this, 'testplugin_ajax_search_todos' ] );
+	}
+
+	public function enqueue_scripts(): void {
+		wp_enqueue_style( 'testplugin-admin', plugins_url( 'styles/admin.css', __FILE__ ), [], self::PLUGIN_VERSION );
 		wp_enqueue_script( 'testplugin-admin', plugins_url( 'scripts/admin.js', __FILE__ ), [], self::PLUGIN_VERSION, true );
 		wp_localize_script( 'testplugin-admin', 'ajaxData', [ 'ajaxUrl' => admin_url( 'admin-ajax.php' ) ] );
-		add_action( 'wp_ajax_testplugin_ajax_load_todos', [ $this, 'testplugin_ajax_load_todos' ] );
 	}
 
 	/**
@@ -153,7 +159,23 @@ class TestPlugin {
 			}
 		}
 
-		wp_send_json_success( [ 'msg' => 'Synchronized!' ] );
+		wp_send_json_success( [ 'todos' => $this->getTodos() ] );
+	}
+
+	public function testplugin_ajax_search_todos(): void {
+		$title = $_POST['title'] ?? '';
+
+		if ( ! $title ) {
+			wp_send_json_error( [ 'msg' => __( 'Incorrect data!', 'testplugin' ) ] );
+		}
+
+		$todos = $this->db->get_results(  "SELECT * FROM {$this->db->prefix}testplugin_todos WHERE title LIKE '%$title%'" );
+
+		if ( empty( $todos ) ) {
+			wp_send_json_error( [ 'msg' => __( 'No results found!', 'testplugin' ) ] );
+		}
+
+		wp_send_json_success( [ 'todos' => $this->getTodos( $todos ) ] );
 	}
 
 	private function check_field_exists( $todo_id ): bool
@@ -165,6 +187,28 @@ class TestPlugin {
 				WHERE todo_id = $todo_id"
 			)
 		);
+	}
+
+	private function getTodos( array $ready_data = [] ): string {
+		if( ! empty( $ready_data ) ) {
+			$todos = $ready_data;
+		}else{
+			$todos = $this->db->get_results(  "SELECT * FROM {$this->db->prefix}testplugin_todos" );
+		}
+
+		$res = '';
+
+		foreach ( $todos as $todo ) {
+			$res .= '<div class="testplugin-todos-item">';
+			$res .= '<div>' . $todo->id . '</div>';
+			$res .= '<div>' . $todo->user_id . '</div>';
+			$res .= '<div>' . $todo->todo_id . '</div>';
+			$res .= '<div>' . $todo->title . '</div>';
+			$res .= '<div>' . ( $todo->completed ? 'Yes' : 'No' ) . '</div>';
+			$res .= '</div>';
+		}
+
+		return $res;
 	}
 }
 

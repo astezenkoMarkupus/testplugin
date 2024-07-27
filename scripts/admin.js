@@ -4,6 +4,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	'use strict'
 
 	fetchPosts()
+	searchByTitle()
 } )
 
 /**
@@ -31,14 +32,52 @@ const fetchPosts = () => {
 	form.addEventListener( 'submit', e => {
 		e.preventDefault()
 
-		const formData = new FormData()
+		const
+			btn = form.querySelector( 'button' ),
+			itemsWrap = document.querySelector( '.testplugin-todos-items' ),
+			formData = new FormData()
 
+		btn.classList.add( 'loading' )
 		formData.append( 'action', 'testplugin_ajax_load_todos' )
 		customAjaxRequest( formData ).then( res => {
+			btn.classList.remove( 'loading' )
+
 			if( res ){
 				switch( res.success ){
 					case true:
-						console.log( res.data.msg )
+						if( itemsWrap ) itemsWrap.innerHTML = res.data.todos
+						break
+
+					default:
+						console.error( res.data.msg )
+				}
+			}
+		} )
+	} )
+}
+
+const searchByTitle = () => {
+	const form = document.querySelector( '.testplugin-form-search' )
+
+	if( ! form ) return
+
+	form.addEventListener( 'submit', e => {
+		e.preventDefault()
+
+		const
+			btn = form.querySelector( 'button' ),
+			itemsWrap = document.querySelector( '.testplugin-todos-items' ),
+			formData = new FormData( form )
+
+		btn.classList.add( 'loading' )
+		formData.append( 'action', 'testplugin_ajax_search_todos' )
+		customAjaxRequest( formData ).then( res => {
+			btn.classList.remove( 'loading' )
+
+			if( res ){
+				switch( res.success ){
+					case true:
+						if( itemsWrap ) itemsWrap.innerHTML = res.data.todos
 						break
 
 					default:
