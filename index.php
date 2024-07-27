@@ -33,6 +33,20 @@ class TestPlugin {
 		add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );
 		add_action( 'wp_ajax_testplugin_ajax_load_todos', [ $this, 'testplugin_ajax_load_todos' ] );
 		add_action( 'wp_ajax_testplugin_ajax_search_todos', [ $this, 'testplugin_ajax_search_todos' ] );
+
+		add_shortcode( 'testplugin', [ $this, 'testplugin_shortcode' ] );
+	}
+
+	public function testplugin_shortcode( $atts, $content ) {
+		$sql = $this->db->prepare( "SELECT * FROM {$this->db->prefix}testplugin_todos
+         	WHERE completed = 0
+	    	ORDER BY RAND()
+	    	LIMIT 5
+	    ");
+
+		$todos = $this->db->get_results( $sql );
+
+		return '<div class="testplugin_shortcode">' . $this->getTodos( $todos ) . '</div>';
 	}
 
 	public function enqueue_scripts(): void {
